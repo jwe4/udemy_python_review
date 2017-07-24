@@ -2,8 +2,13 @@ import constants
 import oauth2
 import urllib.parse as urlparse
 import json
+from database import Database
 from user import User
 
+Database.initialise(user='postgres',
+                    password='12345',
+                    database='learning2',
+                    host='localhost')
 
 # Create a consumer, which uses CONSUMER_KEY and CONSUMER_SECRET to identify our app uniquely
 consumer = oauth2.Consumer(constants.CONSUMER_KEY, constants.CONSUMER_SECRET)
@@ -31,6 +36,8 @@ request_token = dict(urlparse.parse_qsl(content.decode('utf-8')))
 print("Go to following site in your browser:")
 print("{}?oauth_token={}".format(constants.AUTHORIZATION_URL, request_token['oauth_token']));
 
+
+
 oauth_verifier = input("What is the PIN? ")
 
 
@@ -46,8 +53,10 @@ response, content = client.request(constants.ACCESS_TOKEN_URL, 'POST')
 access_token = dict(urlparse.parse_qsl(content.decode('utf-8')))
 print(access_token)
 
-user =  User('jimWvr@yahoo.com', 'jim', 'weaver',access_token['oauth_token'],access_token['oauth_token_secret'] )
+user =  User('jimWvr@yahoo.com', 'jim', 'weaver',access_token['oauth_token'],access_token['oauth_token_secret'], None)
 user.save_to_db();
+print("saved to db")
+exit()
 
 
 
