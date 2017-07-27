@@ -42,7 +42,7 @@ class User:
         response, content = authorized_client.request(uri,verb)
         if response.status != 200:
             print("An error occurred")
-        return json.loads(content.encode('utf-8'))
+        return json.loads(content.decode('utf-8'))
 
     def get_request_token(self):
         # Create a consumer, which uses CONSUMER_KEY and CONSUMER_SECRET to identify our app uniquely
