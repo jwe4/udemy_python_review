@@ -1,10 +1,17 @@
-from flask import Flask, render_template, session, redirect
-from twitter_utils import get_request_token, get_oauth_verifier_url
+from flask import Flask, render_template, session, redirect, request, url_for
+from twitter_utils import get_request_token, get_oauth_verifier_url, get_access_token
+from user import User
+from database import Database
 
 
 
 app = Flask(__name__)
 app.secret_key = '1234'
+
+Database.initialise(user='postgres',
+                    password='12345',
+                    database='learning2',
+                    host='localhost')
 
 
 @app.route('/')
@@ -20,5 +27,21 @@ def twitter_login():
     return redirect(get_oauth_verifier_url(request_token))
 
 
+@app.route('/auth/twitter')
+def twitter_auth(): # http://127.0.0.1:4995/auth/twitter?oauth_verifier=12345
+    oauth_verifier = request.args.get('oauth_verifier')
+    access_token = get_access_token(session['request_token'], oauth_verifier)
+    user = User.load_from_db_by_screen_name(access_token['screen_name'])
+    if not user:
+        user = User(access_token['screen_name'], access_token['oauth_token'],
+                    access_token['oauth_token_secret'], None)
+        user.save_to_db()
+    session['screen_name'] = user.screen_name
+    return redirect(url_for('profile'))
 
-app.run(port=4995)
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html', screen_name=session['screen_name'])
+
+app.run(port=4995, debug=True)

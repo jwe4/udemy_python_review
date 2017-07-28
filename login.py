@@ -16,10 +16,9 @@ if not user:
     access_token = get_access_token(request_token, oauth_verifier)
     print(access_token)
 
-    first_name = input("Enter your first name: ")
-    last_name = input("Enter your last name: ")
+    screen_name = input("Enter your screen name: ")
 
-    user = User(user_email, first_name, last_name, access_token['oauth_token'],access_token['oauth_token_secret'] )
+    user = User(screen_name,  access_token['oauth_token'], access_token['oauth_token_secret'])
     user.save_to_db();
 
 tweets = user.twitter_request('https://api.twitter.com/1.1/search/tweets.json?q=computers+filter:images')
