@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, request, url_for
+from flask import Flask, render_template, session, redirect, request, url_for, g
 from twitter_utils import get_request_token, get_oauth_verifier_url, get_access_token
 from user import User
 from database import Database
@@ -14,6 +14,12 @@ Database.initialise(user='postgres',
                     host='localhost')
 
 
+@app.before_request
+def load_user():
+    if 'screen_name' in session:
+        g.user = User.load_from_db_by_screen_name(session['screen_name'])
+
+
 @app.route('/')
 def homepage():
     return render_template('home.html')
@@ -25,6 +31,12 @@ def twitter_login():
 
     # redirecting the user to Twitter so they can confirm authorization
     return redirect(get_oauth_verifier_url(request_token))
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('homepage'))
 
 
 @app.route('/auth/twitter')
@@ -42,6 +54,6 @@ def twitter_auth(): # http://127.0.0.1:4995/auth/twitter?oauth_verifier=12345
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html', screen_name=session['screen_name'])
+    return render_template('profile.html', user=g.user)
 
 app.run(port=4995, debug=True)
