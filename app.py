@@ -58,7 +58,7 @@ def twitter_auth(): # http://127.0.0.1:4995/auth/twitter?oauth_verifier=12345
 def profile():
     return render_template('profile.html', user=g.user)
 
-@app.route('/search')
+@app.route('/search') # http://127.00.1:4995/search?cars+filter:images
 def search():
     query = request.args.get('q')
     # tweets = g.user.twitter_request('https://api.twitter.com/1.1/search/tweets.json?q=computers+filter:images')
