@@ -29,7 +29,7 @@ class BinaryTree:
             while marker:
                 if node.value == marker.value:
                     # Raise a ValueError, because the node's value already exists.
-                    raise NotImplementedError()
+                    raise ValueError("node with value {} exits".format(node.value))
                 elif node.value > marker.value:
                     slot = marker.get_right()
                     if slot is None:
